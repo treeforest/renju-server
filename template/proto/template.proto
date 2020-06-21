@@ -1,0 +1,14 @@
+syntax="proto2";
+package template;
+
+enum Event {
+    a = 1;
+    b = 2;
+    c = 3;
+}
+
+message Hello {
+    required string name = 1;
+    optional int32 age = 2;
+    repeated bytes msg = 3;
+}

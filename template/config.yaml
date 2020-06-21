@@ -1,0 +1,9 @@
+# 数据库相关配置
+RedisAddr: ""
+RedisPassword: ""
+MongodbAddr: ""
+MongodbUser: ""
+MongodbPassword: ""
+MongodbPoolLimit: ""
+
+# 业务配置

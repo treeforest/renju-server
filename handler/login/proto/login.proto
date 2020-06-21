@@ -1,0 +1,231 @@
+syntax="proto2";
+package login;
+
+//! 返回值及错误码
+enum Code
+{
+    SUCCESS = 0; 						//! 成功
+    ERR_ACCT_EXISTS = 0x30001; 			//注册时账号已存在
+    ERR_ACCT_NOTEXISTS = 0x30002; 		//账号不存在
+    ERR_RPC_CALLFAILED = 0x30003;		//调用失败（RPC调用失败）
+    ERR_SVR_FATAL	= 0x30004;			//svr异常
+    ERR_LOGIN_MODE	= 0x30005;			//登录模式不支持
+    ERR_SESSION_VERIFY = 0x30006;		//session校验失败
+    ERR_SESSION_GENERATE = 0x30007; 	//session生成失败
+    ERR_PWD_VERIFY = 0x30008; 			//密码校验失败
+    ERR_SESSION_EXPIERED = 0x30009; 	//session已失效
+    ERR_PWDCHG_EXPIERED = 0x3000A; 		//密码修改session失效
+    ERR_MSGBODY_DECRYPT = 0x3000B; 		//解密失败
+    ERR_PWD_LEN = 0x3000C; 				//密码长度不对
+    ERR_ENCRYPT_LEN = 0x3000D; 			//加密包长度不对
+    ERR_ACCT_TYPE = 0x3000E; 			//账号类型错误
+    ERR_ACCT_LEN = 0x3000F; 			//账号长度错误
+    ERR_ACCT_USERINFO = 0x30010; 		//用户数据错误
+    ERR_NOTFOUND_DEVICEID = 0x30011;	//设备id没有
+    ERR_BID_INVALID = 0x30012;			//BID非法
+    ERR_PWDCHG_EQUAL = 0x30013;			//密码无修改
+    ERR_CLIENT_TIME = 0x30014;			//客户端时间误差过大
+    ERR_REDIS_FATAL = 0x30015;			//redis异常
+    ERR_PHONENUM_FORMAT = 0x30016;		//手机号格式不对
+    ERR_SMSCODE_VERIFY = 0x30017;		//验证码不对
+    ERR_SMSCODE_TOOFAST = 0x30018;		//请求验证码频率太快
+    ERR_THIRDPART_VERIFY = 0x30019;		//第三方校验失败
+    ERR_THIRDPART_REG = 0x3001A;		//第三方注册失败
+    ERR_PHONE_ACCOUNT_ONLY = 0x3001B; 	//支持手机类型用户
+    ERR_NO_BIND_PHONE = 0x3001C;     	//未绑定手机号
+    ERR_PHONE_BIND_ANOTHER = 0x3001D; 	//手机号绑定了其他账号
+    ERR_EMAIL_FORMAT = 0x3001E;			//邮箱号格式不对
+    ERR_CANT_LOGIN_AGAIN = 0x3001F;		//不能重复登录
+    ERR_SMSCODE_EXPIRE = 0x30020;		//验证码过期
+    ERR_SMSCODE_OUTTIME = 0x30021;		//验证码错误次数过多
+    ERR_THIRDPART_FILL_INFO = 0x30022;	//第三方首次登录需要完善信息
+    ERR_SMSCODE_UNEXPIRE = 0x30023;		//验证码还没过期
+    ERR_THIRD_NO_MAPPING = 0x30024;		//没匹配到第三方账号
+    ERR_UPDATE_THIRD_TOKEN = 0x30025; 	//更新第三方token失败
+    ERR_THIRD_ALREADY_BIND = 0x30026 ; 	//该业务的第三方账号已经有绑定
+    ERR_EMAIL_BIND_ANOTHER = 0x30027; 	//邮箱号绑定了其他账号
+    ERR_PWD_EXISTS		   = 0x30028; 	//密码已存在
+    ERR_PARAM_INVALID      = 0x30029; 	//请求错误无效
+    ERR_APPID_INVALID      = 0x3002A; 	//appid无效
+    ERR_NAME_DUPLICATE     = 0x3002B;   //! 名字重复
+    ERR_NOT_WHITE_LIST     = 0x3002C; 	//非白名单
+    ERR_ACCOUNT_LOCKOUT     = 0x3002D; 	//账号被封
+    ERR_SEX_SETED          =0x3002E; 	//已使用一次设置性别的机会
+    ERR_NAME_SETED          =0x3002F;	//已使用一次设置名字的机会
+
+}
+
+//! 账号类型
+enum AccountType
+{
+    UNKNOW	= 0; //! 未知
+    PHONE	= 1; //! 电话
+    EMAIL	= 2; //! 邮箱
+    VISITOR	= 3; //! 游客(GUID)
+    USERCODE= 4; //! 用户账号
+
+    //! 第三方接入账号类型
+    TAOBAO = 10; //! 淘宝
+    ZH360 = 11;  //! 360
+    YIDONG = 12; //! 移动
+    AIYOUXI = 13;//! 爱游戏
+    HUAWEI = 14; //! 华为
+    OPPO = 15;   //! OPPO
+    FACEBOOK = 16; //! facebook
+    QEMAIL = 17;    //! email
+    WEIXIN = 18; //! 微信
+    QQ = 19;    //! QQ
+    WEIBO = 20;    //! 微博
+}
+
+//! 设备类型
+enum DeviceType
+{
+    WIN = 0; 		//! windows
+    IOS = 1; 		//! iPhone
+    ANDROID = 2; 	//! 安卓
+    WEB = 3; 		//! 网页
+    MAC = 4; 		//! mac
+}
+
+//！ 性别
+enum SexValue
+{
+    UNKNOWN = 0;
+    BOY = 1;
+    GIRL = 2;
+}
+
+//! 手机号注册状态
+enum IntelligentPhoneCheckCode
+{
+    NOTHIND	=	0;	//其它
+    NOPAWD  =   1;  //已注册,没密码
+    UNREG   =   2;  //未注册
+    INVALID =   3;  //手机号无效
+    PAWD    =   4;  //已注册,有密码
+
+}
+
+//! 用户信息
+message UserInfo
+{
+    optional SexValue		sex = 1 ;		//! 性别
+    optional string			name = 2 ;	    //! 姓名
+    optional string			avatar = 3 ; 	//! 头像
+    optional string			extend = 4 ; 	//! 拓展信息
+    optional string			phone = 6 ;  	//! 手机号
+    optional string			email	= 8 ;   //! 邮箱
+    optional bool           isRobot   = 11; //! 是否为机器人
+}
+
+
+//! 登录的扩展信息
+message LoginExtend 
+{ 
+	optional string 		device_guid = 1  ; 	// 设备guid 没有就不填，比如网页登录
+	optional DeviceType 	device_type = 2  ; 	// 设备类型
+	optional uint64			client_time = 3  ; 	// 客户端时间，UNIX_TIMESTAMP 秒级，如果与服务器差异太大则不允许登录
+	optional float 			latitude 	= 4  ; 	// 纬度
+	optional float 			longitude 	= 5  ; 	// 经度
+	optional string 		language 	= 6  ; 	// 使用语言
+}
+
+//! 本地登录请求
+message LoginRequest 
+{
+	optional AccountType	account_type = 1  ;   //! 账号类型(账号登录时)
+	optional string			account      = 2  ;   //! 关联账号ID(账号登录时)
+	optional string			password     = 3  ;   //! 密码(账号登录时)
+	optional LoginExtend	ext          = 4  ;   //! 扩展信息
+}
+
+//! 第三方登录请求
+message ThirdLoginRequest
+{
+	optional AccountType	account_type = 1; 	    //! 哪个平台
+	optional string			platuid     = 2 ;		//! 平台id
+	optional string			thirdToken  = 3 ;       //! 账号token(用于第三方账号token)
+	optional string			extend      = 4 ;		//! 第三方接入扩展参数(可选)
+	optional LoginExtend	ext         = 5 ;       //! 扩展信息
+}
+
+// 统一登录回复
+message LoginResponse 
+{
+	optional int32      	result = 1 ;
+	optional bytes			session     = 2;		//！登录成功返回该session
+	optional UserInfo		userInfo = 3  ; 		//! 用户信息(登录成功时)
+	optional uint32			sessionTimeout = 4 ;    //! session超时时间
+	optional string			platuid     = 5 ;       //! 拓展参数，某些第三方平台会用到
+	optional string			platToken   = 6 ;       //! 拓展参数，某些第三方平台会用到
+}
+
+//! session登录 或是重连
+message RetryLoginRequest
+{
+	optional int64			ID     		= 1 ;  	    //! 系统统一账号
+	optional bytes			session     = 2;        //! session(SESSION登录时)
+	optional LoginExtend	ext         = 3  ;      //! 扩展信息
+}
+
+//! session验证请求
+message CheckSessionRequest
+{
+	optional int64			ID     = 1 ;  			//! 系统统一账号
+	optional bytes			session     = 2 ; 		//! 校验session
+	optional string			device_guid = 3  ; 		//! 设备的guid
+}
+
+//! session验证回复 
+message CheckSessionResponse
+{
+	optional int32	        result = 1 ;
+	optional int64			ID     = 2  ; 			//! 系统统一账号
+}
+
+//! 获取短信验证码请求
+message GetLoginSmsCodeRequest
+{
+	optional string 		phone_num   = 1  ; 		//! 手机号
+	optional int32			zoneId	    = 2  ; 		//! 国家区号，中国是86，不填默认是中国
+}
+
+//! 获取短信验证码请求回复
+message GetLoginSmsCodeResponse
+{
+	optional int32		    result = 1 ;				//! 返回值Code 
+	optional int64			ExpireTime  = 2 ;			//! 短信验证过期时间
+}
+
+//! 短信验证码登录请求。回复使用 LoginResponse
+message LoginBySmsCodeRequest
+{
+	optional string 		phone_num   = 1  ; 		//! 手机号
+	optional int32			zoneId	    = 2  ; 		//! 国家区号，中国是86
+	optional int32			sms_code    = 3  ; 		//! 短信验证码
+	optional LoginExtend	ext         = 4  ; 		//! 扩展信息
+}
+
+//! 一键手机注册
+message AutoRegistryRequest 
+{
+  	optional string 		phone_num   = 1  ; 		//! 手机号
+  	optional int32			zoneId	    = 2  ; 		//! 国家区号，中国是86
+  	optional int32			sms_code    = 3  ; 		//! 短信验证码
+  	optional LoginExtend	ext         = 4  ;     	//! 扩展信息
+}
+
+//! 检测手机号的注册状态请求
+message PhoneCheckRequest
+{
+	optional string 		phone_num   = 1  ; 		//! 手机号
+	optional int32			zoneId	    = 2  ; 		//! 国家区号，中国是86
+}
+
+//! 检测手机号的注册状态回复
+message PhoneCheckResponse
+{
+	optional int32	        result = 1 ;
+    optional IntelligentPhoneCheckCode code  = 2  ; // 状态
+}
