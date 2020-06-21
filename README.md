@@ -1,1 +1,1 @@
-# Reju Server# renju-server
+# Reju Server
