@@ -1,0 +1,104 @@
+syntax="proto2";
+package registry; //协议包名
+
+//! 注册的事件端口（接口ID）
+enum Event
+{
+    REGISTRY              = 0x0001; // 注册账号 RegisterRequest RegisterResponse
+    GET_SMS_CODE          = 0x0002; // 获取手机验证码 GetSmsCodeRequest GetSmsCodeResponse
+    PRE_CHECK_CODE        = 0x0003; // 验证手机验证码 PreCheckCSmsCodeRequest PreCheckCSmsCodeResponse
+    GET_MAIL_CODE         = 0x0008; // 获取邮箱验证码 GetMailCodeRequest GetMailCodeResponse
+    PRE_CHECK_MAIL_CODE   = 0x0009; // 验证邮箱验证码 PreCheckCMailCodeRequest PreCheckCMailCodeResponse
+}
+
+//! 返回码
+enum Code
+{
+    SUCCESS = 0; 				        //! 成功
+    ERR_ACCT_EXISTS = 0x30001; 	        //注册时账号已存在
+    ERR_UNMARSHAL = 0x30002;            //反序列化失败
+    ERR_REDIS_FATAL = 0x30003;		    //redis异常
+    ERR_PHONENUM_FORMAT = 0x30004;	    //手机号格式不对
+    ERR_CODE_VERIFY = 0x30005;	        //验证码不对
+    ERR_CODE_TOOFAST = 0x30006;	        //请求验证码频率太快
+    ERR_EMAIL_FORMAT = 0x30007;		    //邮箱号格式不对
+    ERR_CODE_EXPIRE = 0x30008;	        //验证码过期
+    ERR_CODE_OUTTIME = 0x30009;	        //验证码错误次数过多
+    ERR_THIRDPART_FILL_INFO = 0x3000A;	//第三方首次登录需要完善信息
+    ERR_CODE_UNEXPIRE = 0x3000B;	    //验证码还没过期
+    ERR_EMAIL_BIND_ANOTHER = 0x3000C;   //邮箱号绑定了其他账号
+    ERR_PWD_EXISTS		   = 0x3000D;   //密码已存在
+    ERR_NOT_WHITE_LIST     = 0x3000E;   //非白名单
+    ERR_ACCOUNT_LOCKOUT     = 0x3000F;  //账号被封
+    ERR_SVR_FATAL	        = 0x30010;  //svr异常
+}
+
+//! 账号类型
+enum AccountType
+{
+    PHONE	= 1; //! 电话
+    EMAIL	= 2; //! 邮箱
+    VISITOR	= 3; //! 游客(GUID)
+}
+
+//! 注册
+message RegisterRequest
+{
+    required AccountType    account_type    = 1; // 注册的账号类型
+	optional string			code            = 2; // 验证码
+	optional string         account         = 3; // 注册的账号（填写手机号/邮箱号，与AccountType匹配）
+}
+
+message RegisterResponse
+{
+	optional int32		    result = 1;
+	optional int64			userId = 2; //! 注册成功后，服务端返回的唯一ID
+}
+
+//! 获取验证码手机
+message GetSmsCodeRequest
+{
+	optional string 		phone_num           = 1; // 手机号
+}
+
+message GetSmsCodeResponse
+{
+	optional int32		    result      = 1;
+	optional int64			ExpireTime  = 2;
+}
+
+// 提前验证短信密码是否正确，正确之后再进行注册请求
+message PreCheckSmsCodeRequest
+{
+	optional string 		phone_num   = 1; // 手机号
+	optional string			sms_code    = 2; // 短信验证码
+}
+
+message PreCheckSmsCodeResponse
+{
+	optional int32		    result = 1;
+}
+
+//! 获取验证码邮箱
+message GetMailCodeRequest
+{
+	optional string 		email       = 1; // 邮箱
+}
+
+message GetMailCodeResponse
+{
+	optional int32		    result = 1;
+	optional int64			ExpireTime = 2;
+}
+
+// 提前验证邮箱密码是否正确，正确之后再进行注册请求
+message PreCheckCMailCodeRequest
+{
+	optional string 		email       = 1; // 邮箱
+	optional string			email_code   = 2; // 邮箱验证码
+}
+
+message PreCheckCMailCodeResponse
+{
+	optional int32		    result = 1;
+}

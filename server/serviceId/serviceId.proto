@@ -1,0 +1,12 @@
+syntax="proto2";
+package serviceId;
+
+// serviceID 段的标志，进行路由用
+enum ID {
+    LOGIN      	= 0x0010; // 登录服
+    CHAT       	= 0x0011; // 聊天服
+    USER       	= 0x0012; // 用户服(用户请求一些关于个人信息，或者修改信息)
+    TABLE      	= 0x0013; // 桌子服(用户进行比配以及进行比赛时，请求该服务)
+    MATCH      	= 0x0014; // 比赛服
+	REGISTRY	= 0x0015; // 注册服
+}

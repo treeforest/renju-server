@@ -1,5 +1,10 @@
 package server
 
+import (
+	"github.com/treeforest/renju-server/server/serviceId"
+	"github.com/treeforest/renju-server/handler/registry/route"
+)
+
 /*
  * 注册服务
  *
@@ -8,5 +13,6 @@ package server
  *  router: 服务实现的内部路由
  */
 func registerRouter() {
-	// Server().RegisterRouter()
+	// 注册服
+	Server().RegisterRouter(uint32(serviceId.ID_REGISTRY), &registry_route.RegistryRoute{})
 }
