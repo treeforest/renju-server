@@ -31,6 +31,7 @@ enum Code
     ERR_NOT_WHITE_LIST     = 0x3000E;   //非白名单
     ERR_ACCOUNT_LOCKOUT     = 0x3000F;  //账号被封
     ERR_SVR_FATAL	        = 0x30010;  //svr异常
+    ERR_BLACK_LIST          = 0x30011;  //黑名单
 }
 
 //! 账号类型
@@ -45,8 +46,10 @@ enum AccountType
 message RegisterRequest
 {
     required AccountType    account_type    = 1; // 注册的账号类型
-	optional string			code            = 2; // 验证码
-	optional string         account         = 3; // 注册的账号（填写手机号/邮箱号，与AccountType匹配）
+    optional string         userName        = 2; // 用户名（要求唯一）
+    optional string         password        = 3; // 密码（当前仅前端判断格式要求）
+    optional string         account         = 4; // 注册的账号（填写手机号/邮箱号，与AccountType匹配）
+	optional string			code            = 5; // 验证码
 }
 
 message RegisterResponse
@@ -64,7 +67,7 @@ message GetSmsCodeRequest
 message GetSmsCodeResponse
 {
 	optional int32		    result      = 1;
-	optional int64			ExpireTime  = 2;
+	optional int64			ExpireTime  = 2; // 验证码过期时间，目前返回300s
 }
 
 // 提前验证短信密码是否正确，正确之后再进行注册请求

@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// 数据库初始化
 func initDatabase() error {
 	// 初始化 Redis
 	redisAddr := Config().Get("RedisAddr").String("0.0.0.0:6379")

@@ -2,7 +2,6 @@ package logic
 
 import (
 	"regexp"
-	"github.com/treeforest/renju-server/global"
 )
 
 /*
@@ -24,9 +23,4 @@ func VerifyMobileFormat(mobileNum string) bool {
 
 	reg := regexp.MustCompile(regular)
 	return reg.MatchString(mobileNum)
-}
-
-// redis key
-func getRedisKey(key string) string {
-	return global.GetRegistryID() + "_" + key
 }
